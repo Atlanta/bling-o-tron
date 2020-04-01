@@ -1,0 +1,21 @@
+{
+  "name": "bling-o-tron",
+  "version": "0.1.0",
+  "description": "A currency bot",
+  "main": "index.js",
+  "dependencies": {
+    "@keyv/sqlite": "^2.0.2",
+    "discord.js": "^12.1.1",
+    "keyv": "^4.0.0",
+    "quick.db": "^7.0.0-b22"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "nodemon ."
+  },
+  "author": "Julien Hubert",
+  "license": "ISC"
+}
