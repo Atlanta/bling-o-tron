@@ -13,7 +13,30 @@ module.exports = {
         const db = new Keyv('sqlite://db/' + message.guild.id.toString() + '.sqlite');
         const bank = new Keyv('sqlite://db/' + message.guild.id.toString() + '.sqlite', { namespace: 'bank' });
 
-        let customCurrency = await db.get('config.currency');
+        const authorizedChannels = (await db.get('config.bankChannel')) || [];
+
+        if (!authorizedChannels.includes('<#' + message.channel.id + '>')) {
+            let errorMessage;
+            if (authorizedChannels.length < 1) {
+                errorMessage = await message.channel.send('Sorry <@' + message.author.id + '>, you cannot use this command right now.');
+            } else if (authorizedChannels.length === 1) {
+                errorMessage = await message.channel.send('Hey <@' + message.author.id + '> ! Please use the `bank` command in the ' + authorizedChannels[0] + ' channel !');
+            } 
+            if (authorizedChannels.length > 1) {
+                let response = 'Hey <@' + message.author.id + '> ! Please use the `bank` command in one of these channels :\n';
+                authorizedChannels.forEach(channel => {
+                    response += '- ' + channel + '\n';
+                });
+                errorMessage = await message.channel.send(response);
+            }
+
+            await message.delete();
+            setTimeout(() => errorMessage.delete(), 10000);
+
+            return;
+        }
+
+        const customCurrency = await db.get('config.currency');
 
         // User wants his account
         if (args.length === 0) {
