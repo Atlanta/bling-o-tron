@@ -4,7 +4,11 @@ const { currency } = require('../config.json');
 
 module.exports = {
 	name: 'bank-channel',
-    description: 'Set allowed channels for !bank command on this server.',
+    description: 'Get/set allowed channels for !bank command on this server.',
+    args: [
+        '[add|remove]',
+        '[#channel-id]'
+    ],
     /**
      * @param {Discord.Message} message 
      * @param {string[]} args

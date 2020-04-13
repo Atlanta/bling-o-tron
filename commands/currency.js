@@ -3,8 +3,11 @@ const Discord = require('discord.js');
 
 module.exports = {
 	name: 'currency',
-    description: 'Set the currency icon for the whole server.',
+    description: 'Get/set the currency icon for the whole server.',
     permission: 'ADMINISTRATOR',
+    args: [
+        '[new-currency]'
+    ],
     /**
      * @param {Discord.Message} message 
      * @param {string[]} args
