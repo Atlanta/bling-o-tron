@@ -1,15 +1,19 @@
 const Keyv = require('keyv');
 const Discord = require('discord.js');
-const { currency } = require('../config.json');
+const {google} = require('googleapis');
+const { currency, googleToken, spreadsheetId } = require('../config.json');
 
 module.exports = {
-	name: 'bank',
+    name: 'bank',
     description: 'Shows your personnal bank balance.',
+    args: [
+        '[@user]'
+    ],
     /**
-     * @param {Discord.Message} message 
-     * @param {string[]} args
-     */
-	async execute(message, args) {
+    * @param {Discord.Message} message 
+    * @param {string[]} args
+    */
+    async execute(message, args) {
         const db = new Keyv('sqlite://db/' + message.guild.id.toString() + '.sqlite');
         const bank = new Keyv('sqlite://db/' + message.guild.id.toString() + '.sqlite', { namespace: 'bank' });
 
@@ -37,18 +41,11 @@ module.exports = {
         }
 
         const customCurrency = await db.get('config.currency');
+        let user = 0;
 
         // User wants his account
         if (args.length === 0) {
-            let balance = await bank.get(message.author.id);
-
-            if (undefined == balance) {
-                await bank.set(message.author.id, 0);
-                balance = 0;
-            }
-
-            console.debug(message.author.tag + ' (' + message.author.id + ') asked for his balance : ' + balance);
-            message.channel.send('Your balance: ' + balance + (customCurrency || currency));
+            user = message.author.id;
         } else { // Now he wants someone else account
             // But only if he has permissions !
             if (!message.member.hasPermission('ADMINISTRATOR')) {
@@ -58,16 +55,41 @@ module.exports = {
             let userTag = args[0];
             if (!userTag.startsWith('<@!')) {
                 message.channel.send('Please tag someone !');
-
                 return;
             }
 
-            let user = userTag.substring(3, 21);
-            let balance = await bank.get(user);
-            if (undefined == balance) balance = 0;
-
-            console.debug(message.author.tag + ' (' + message.author.id + ') asked for ' + user + ' balance : ' + balance);
-            message.channel.send(message.guild.member(user).user.tag + '\'s balance: ' + balance.toString() + (customCurrency || currency));
+            user = userTag.substring(3, 21);
         }
-	},
+
+        const sheets = google.sheets({version: 'v4', auth: googleToken});
+        sheets.spreadsheets.values.get({
+            spreadsheetId,
+            range: 'Bank!A2:C',
+        }, (err, res) => {
+            if (err) {
+                message.channel.send(`Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!`);
+                console.error('An error happened while using Google API: ', err);
+                return;
+            }
+            /** @type {string[][]} rows */
+            const rows = res.data.values;
+            if (rows.length) {
+                const row = rows.find(row => {
+                    return row[0] == user;
+                });
+
+                if (!row) {
+                    message.channel.send(`No record was found for this user.`);
+
+                    return;
+                }
+
+                const balance = row[2].replace(/\s/g, '');
+                message.channel.send(`<@!${user}>'s balance: ${balance}${customCurrency || currency}`);
+            } else {
+                message.channel.send(`Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!`);
+                console.log('No data found in spreadsheet.');
+            }
+        });
+    },
 };

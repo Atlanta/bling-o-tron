@@ -3,7 +3,10 @@ const Discord = require('discord.js');
 
 module.exports = {
 	name: 'prefix',
-    description: 'Set commands prefix for this server.',
+    description: 'Get/set commands prefix for this server.',
+    args: [
+        '<new-prefix>'
+    ],
     /**
      * @param {Discord.Message} message 
      * @param {string[]} args

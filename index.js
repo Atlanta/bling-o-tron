@@ -1,6 +1,8 @@
 const fs = require('fs');
 const Keyv = require('keyv');
+const readline = require('readline');
 const Discord = require('discord.js');
+const {google} = require('googleapis');
 const { currency, prefix, token } = require('./config.json');
 
 const client = new Discord.Client();
@@ -37,7 +39,20 @@ client.on('message', async message => {
 });
 
 client.on('guildCreate', guild => {
-	const db = new Keyv('sqlite://db/' + message.guild.id.toString() + '.sqlite');
-})
+	const db = new Keyv('sqlite://db/' + guild.id + '.sqlite');
+});
 
-client.login(token);
+client.on('guildMemberAdd', async guildMember => {
+    const db = new Keyv('sqlite://db/' + guildMember.guild.id + '.sqlite');
+    const role = await db.get('config.welcomeRole');
+
+    if (role) {
+        guildMember.roles.add(role)
+        .catch((reason) => {
+            console.error(reason);
+            guildMember.guild.systemChannel.send('Hey! Bling-o-tron tried to set a role to a new user, but it failed. Please check that the bot role ("Bling-o-tron") is higher than the role the bot is trying to add.');
+        });
+    }
+});
+
+client.login(token)

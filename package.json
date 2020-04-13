@@ -1,15 +1,16 @@
 {
   "name": "bling-o-tron",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A currency bot",
   "main": "index.js",
   "dependencies": {
     "@keyv/sqlite": "^2.0.2",
     "discord.js": "^12.1.1",
+    "googleapis": "^39.2.0",
     "keyv": "^4.0.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.2"
+    "nodemon": "^2.0.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

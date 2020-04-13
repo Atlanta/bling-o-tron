@@ -1,5 +1,7 @@
 {
     "prefix": "!",
     "token": "",
-    "currency": ":yellow_circle:"
+    "currency": ":yellow_circle:",
+    "googleToken": "",
+    "spreadsheetId": ""
 }
