@@ -59,8 +59,6 @@ client.on('guildMemberAdd', async guildMember => {
             guildMember.guild.systemChannel.send('Hey! Bling-o-tron tried to set a role to a new user, but it failed. Please check that the bot role ("Bling-o-tron") is higher than the role the bot is trying to add.');
         });
 	}
-
-	rules.sendRules(guildMember.guild, guildMember);
 });
 
 authorize().then(() => {
