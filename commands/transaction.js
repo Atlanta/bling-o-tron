@@ -31,7 +31,7 @@ module.exports = {
         const customCurrency = (await db.get('config.currency')) || currency;
         const hasPermission = await this.hasPermission(message.member);
 
-        if (!message.member.hasPermission('ADMINISTRATOR') && !hasPermission) {
+        if (!hasPermission && !message.member.hasPermission('ADMINISTRATOR')) {
             return;
         }
 
@@ -62,7 +62,7 @@ module.exports = {
                     message.channel.send('Please provide a valid amount !');
                     return;
                 }
- 
+
                 let description = arguments
                     .slice(message.mentions.members.size + 1, arguments.length)
                     .reduce((previous, current) => previous + ' ' + current, '');
@@ -161,9 +161,9 @@ module.exports = {
         const db = new Keyv('sqlite://db/' + member.guild.id + '.sqlite');
 
         /** @type {string[]} authorizedRoles */
-        const authorizedRoles = await db.get('config.transactionRoles') || [];
+        const authorizedRoles = await db.get('config.transactionRole') || [];
 
-        for (const role in authorizedRoles) {
+        for (const role of authorizedRoles) {
             if (member.roles.cache.has(role)) {
                 return true;
             }

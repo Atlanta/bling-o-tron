@@ -1,6 +1,5 @@
 const Keyv = require('keyv');
 const Discord = require('discord.js');
-const { currency } = require('../config.json');
 
 module.exports = {
 	name: 'transaction-role',
@@ -31,7 +30,7 @@ module.exports = {
 
             let response = 'These roles can use the `transaction` command :\n';
             authorizedRoles.forEach(role => {
-                response += '- ' + role + '\n'
+                response += '- <@&' + role + '>\n'
             });
 
             message.channel.send(response);
@@ -48,33 +47,34 @@ module.exports = {
             return;
         }
 
-        const [action, role] = args;
+        const action = args[0];
+        const role = message.mentions.roles.first();
 
         /** @type {string[]} authorizedRoles */
         const authorizedRoles = (await db.get('config.transactionRole')) || [];
 
         switch (action.toLowerCase()) {
             case 'add':
-                if (authorizedRoles.includes(role)) {
-                    message.channel.send(role + ' is already an authorized role !');
+                if (authorizedRoles.includes(role.id)) {
+                    message.channel.send('<@&' + role + '> is already an authorized role !');
                     return;
                 }
 
-                authorizedRoles.push(role);
+                authorizedRoles.push(role.id);
                 await db.set('config.transactionRole', authorizedRoles);
 
-                message.channel.send(role + ' can now use the `transaction` command !');
+                message.channel.send('<@&' + role + '> can now use the `transaction` command !');
                 break;
 
             case 'remove':
-                if (!authorizedRoles.includes(role)) {
-                    message.channel.send(role + ' is not an authorized role !');
+                if (!authorizedRoles.includes(role.id)) {
+                    message.channel.send('<@&' + role + '> is not an authorized role !');
                     return;
                 }
 
-                authorizedRoles.splice(authorizedRoles.indexOf(role), 1);
+                authorizedRoles.splice(authorizedRoles.indexOf(role.id), 1);
                 await db.set('config.transactionRole', authorizedRoles);
-                message.channel.send(role + ' can\'t use the `transaction` command anymore !');
+                message.channel.send('<@&' + role + '> can\'t use the `transaction` command anymore !');
                 break;
 
             default:
