@@ -1,6 +1,6 @@
 {
   "name": "bling-o-tron",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bot helper for WoW boosting communities.",
   "main": "index.js",
   "dependencies": {
