@@ -1,19 +1,19 @@
 {
   "name": "bling-o-tron",
-  "version": "0.3.0",
-  "description": "A currency bot",
+  "version": "1.0.0",
+  "description": "Bot helper for WoW boosting communities.",
   "main": "index.js",
   "dependencies": {
     "@keyv/sqlite": "^2.0.2",
     "discord.js": "^12.1.1",
     "googleapis": "^39.2.0",
-    "keyv": "^4.0.0"
+    "keyv": "^4.0.0",
+    "readline-promise": "^1.0.4"
   },
   "devDependencies": {
     "nodemon": "^2.0.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "nodemon ."
   },
   "author": "Julien Hubert",

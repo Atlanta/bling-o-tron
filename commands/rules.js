@@ -28,7 +28,7 @@ module.exports = {
         if (channel.type != 'text') return;
 
         const db = new Keyv('sqlite://db/' + message.guild.id + '.sqlite');
-        db.set('rules-channel', channel.id);
+        db.set('config.rulesChannel', channel.id);
 
         message.channel.send('Rules channel set to <#' + channel + '>.');
     },
@@ -39,7 +39,7 @@ module.exports = {
     async sendRules(guild, member) {
         const db = new Keyv('sqlite://db/' + guild.id + '.sqlite');
 
-        const channelID = await db.get('rules-channel');
+        const channelID = await db.get('config.rulesChannel');
         /** @type {Discord.TextChannel} */
         const channel = guild.channels.resolve(channelID);
 

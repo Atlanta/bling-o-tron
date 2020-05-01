@@ -1,8 +1,11 @@
 const fs = require('fs');
 const Keyv = require('keyv');
+const util = require('util');
 const readline = require('readline');
 const Discord = require('discord.js');
 const {google} = require('googleapis');
+const { authorize } = require('./security/google');
+const credentials = require('./credentials.json');
 const { currency, prefix, token } = require('./config.json');
 const rules = require('./commands/rules');
 
@@ -60,4 +63,6 @@ client.on('guildMemberAdd', async guildMember => {
 	rules.sendRules(guildMember.guild, guildMember);
 });
 
-client.login(token)
+authorize().then(() => {
+	client.login(token);
+}).catch(err => console.error(err));

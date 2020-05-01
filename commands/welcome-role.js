@@ -20,7 +20,7 @@ module.exports = {
         const db = new Keyv('sqlite://db/' + message.guild.id.toString() + '.sqlite');
 
         if (args.length < 1) {
-            const role = await db.get('config.welcomeRole');
+            const role = await db.get('welcomeRole');
 
             if (!role) {
                 message.channel.send('No role will be attribued to new users.');

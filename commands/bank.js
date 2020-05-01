@@ -1,6 +1,7 @@
 const Keyv = require('keyv');
 const Discord = require('discord.js');
 const {google} = require('googleapis');
+const { authorize } = require('../security/google');
 const { currency, googleToken, spreadsheetId } = require('../config.json');
 
 module.exports = {
@@ -15,7 +16,6 @@ module.exports = {
     */
     async execute(message, args) {
         const db = new Keyv('sqlite://db/' + message.guild.id.toString() + '.sqlite');
-        const bank = new Keyv('sqlite://db/' + message.guild.id.toString() + '.sqlite', { namespace: 'bank' });
 
         const authorizedChannels = (await db.get('config.bankChannel')) || [];
 
@@ -61,7 +61,8 @@ module.exports = {
             user = userTag.substring(3, 21);
         }
 
-        const sheets = google.sheets({version: 'v4', auth: googleToken});
+        const authClient = await authorize();
+        const sheets = google.sheets({version: 'v4', auth: authClient});
         sheets.spreadsheets.values.get({
             spreadsheetId,
             range: 'Bank!A2:C',
@@ -84,7 +85,7 @@ module.exports = {
                     return;
                 }
 
-                const balance = row[2].replace(/\s/g, '');
+                const balance = row[2];
                 message.channel.send(`<@!${user}>'s balance: ${balance}${customCurrency || currency}`);
             } else {
                 message.channel.send(`Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!`);
