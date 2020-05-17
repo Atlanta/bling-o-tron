@@ -1,10 +1,11 @@
 const Keyv = require('keyv');
 const Discord = require('discord.js');
+const i18n = require("../lib/utils/i18n");
 const { currency } = require('../config.json');
 
 module.exports = {
 	name: 'bank-channel',
-    description: 'Get/set allowed channels for !bank command on this server.',
+    description: i18n.__("Get/set allowed channels for !bank command on this server."),
     args: [
         '[add|remove]',
         '[#channel-id]'
@@ -25,7 +26,7 @@ module.exports = {
             const authorizedChannels = (await db.get('config.bankChannel')) || [];
 
             if (authorizedChannels.length === 0) {
-                message.channel.send('No channel is configured !');
+                message.channel.send(i18n.__("No channel is configured for the `bank` command."));
                 return;
             }
 

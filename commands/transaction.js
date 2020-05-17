@@ -1,26 +1,24 @@
 const Keyv = require('keyv');
 const Discord = require('discord.js');
 const { google } = require('googleapis');
+const i18n = require("../lib/utils/i18n");
 const Economy = require('../lib/utils/economy');
 const { authorize } = require('../security/google');
 const { currency, spreadsheetId } = require('../config.json');
 
 module.exports = {
 	name: 'transaction',
-    description: 'Manage transactions in Google Sheets.',
+    description: i18n.__('Manage transactions in Google Sheets.'),
     permission: 'ADMINISTRATOR',
     args: [
-        '<add|show|edit|delete>',
+        '<add>',
         '<show|edit|delete:id>',
-        '<add|edit:@player>',
-        '<add|edit:amount>',
-       ' [add|edit:...description]'
+        '<@player>',
+        '<amount>',
+       ' [...description]'
     ],
     actions: [
         'add',
-        'show',
-        'edit',
-        'delete'
     ],
     /**
      * @param {Discord.Message} message 
@@ -49,7 +47,7 @@ module.exports = {
                 message.channel.startTyping();
 
                 if (message.mentions.members.size < 1) {
-                    message.channel.send("Please tag one or more users.");
+                    message.channel.send(i18n.__("Please tag one or more users."));
                     return;
                 }
 
@@ -59,7 +57,7 @@ module.exports = {
                 try {
                     amount = Economy.parseAmount(arguments[message.mentions.members.size]);
                 } catch (error) {
-                    message.channel.send('Please provide a valid amount !');
+                    message.channel.send(i18n.__('Please provide a valid amount !'));
                     return;
                 }
 
@@ -71,10 +69,20 @@ module.exports = {
 
                 if (members.size == 1) {
                     await this.addTransaction(message, members.first(), amount, description);
-                    message.channel.send('Transaction created! ID: `' + message.id + '`. Amount: ' + formattedAmount + ' ' + customCurrency + '. Booster: <@' + members.first() + '>');
+                    message.channel.send(i18n.__('Transaction created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}. Booster: {{{booster}}}', {
+                        id: message.id,
+                        amount: formattedAmount,
+                        currency: customCurrency,
+                        booster: members.first().toString()
+                    }));
                 } else {
                     await this.batchAddTransaction(message, members, amount, description);
-                    message.channel.send('Transaction created! ID: `' + message.id + '`. Amount: ' + formattedAmount + ' ' + customCurrency + '. Boosters: ' + members.reduce((r, v) => `${r} ${v}`));
+                    message.channel.send(i18n.__('Transaction created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}. Boosters: {{{boosters}}}', {
+                        id: message.id,
+                        amount: formattedAmount,
+                        currency: customCurrency,
+                        boosters: members.reduce((r, v) => `${r} ${v.toString()}`, '')
+                    }));
                 }
 
                 message.channel.stopTyping();
@@ -106,7 +114,7 @@ module.exports = {
             }
         });
 
-        const date = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(Date.now());
+        const date = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(Date.now());
 
         const appendedRow = await sheets.spreadsheets.values.append({
             spreadsheetId,

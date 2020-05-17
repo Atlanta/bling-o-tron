@@ -1,0 +1,19 @@
+{
+	"language.set": "Langue configurée sur Français (France).",
+	"Hey <@{{authorId}}> ! Please use the `bank` command in one of these channels :\n": "Bonjour <@{{authorId}}> ! Merci d'utiliser la commande `bank` dans un de ces canaux :\n",
+	"Hey <@{{authorId}}> ! Please use the `bank` command in the {{authorizedChannel}} channel !": "Bonjour <@{{authorId}}> ! Merci d'utiliser la commande `bank` dans le canal {{authorizedChannel}} !",
+	"Sorry <@{{authorId}}>, you cannot use this command right now.": "Désolé <@{{authorId}}>, vous n'avez pas l'autorisation d'utiliser cette commande.",
+	"Get/set allowed channels for !bank command on this server.": "Get/set allowed channels for !bank command on this server.",
+	"Adds an advance in Google Sheets.": "Adds an advance in Google Sheets.",
+	"Shows your personnal bank balance.": "Shows your personnal bank balance.",
+	"Please tag someone !": "Merci de mentionner un utilisateur !",
+	"<@!{{user}}>'s balance: {{balance}} {{{customCurrency}}}": "Solde de <@!{{user}}> : {{balance}} {{{customCurrency}}}",
+	"Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!": "Oups, une erreur est survenue. Merci de réessayer plus tard. Si cette erreur persiste, merci de contacter le support !",
+	"No record was found for this user.": "Aucune entrée n'a été trouvée pour cet utilisateur.",
+    "Manage transactions in Google Sheets.": "Manage transactions in Google Sheets.",
+    "Please tag one or more users.": "Merci de mentionner un ou plusieurs utilisateurs.",
+    "Please provide a valid amount !": "Le montant fourni est invalide !",
+    "Transaction created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}. Booster: {{{booster}}}": "Transaction ajoutée ! ID : `{{id}}`. Montant : {{amount}} {{{currency}}}. Booster : {{{booster}}}",
+    "Transaction created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}. Boosters: {{{boosters}}}": "Transaction ajoutée ! ID : `{{id}}`. Montant : {{amount}} {{{currency}}}. Boosters : {{{boosters}}}",
+    "Advance created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}": "Accompte ajouté ! ID : `{{id}}`. Montant : {{amount}} {{{currency}}}"
+}

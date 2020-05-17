@@ -1,12 +1,13 @@
 const Keyv = require('keyv');
 const Discord = require('discord.js');
 const {google} = require('googleapis');
+const i18n = require("../lib/utils/i18n");
 const { authorize } = require('../security/google');
-const { currency, googleToken, spreadsheetId } = require('../config.json');
+const { currency, spreadsheetId, language } = require('../config.json');
 
 module.exports = {
     name: 'bank',
-    description: 'Shows your personnal bank balance.',
+    description: i18n.__("Shows your personnal bank balance."),
     args: [
         '[@user]'
     ],
@@ -22,12 +23,12 @@ module.exports = {
         if (!authorizedChannels.includes('<#' + message.channel.id + '>')) {
             let errorMessage;
             if (authorizedChannels.length < 1) {
-                errorMessage = await message.channel.send('Sorry <@' + message.author.id + '>, you cannot use this command right now.');
+                errorMessage = await message.channel.send(i18n.__('Sorry <@{{authorId}}>, you cannot use this command right now.', {authorId: message.author.id}));
             } else if (authorizedChannels.length === 1) {
-                errorMessage = await message.channel.send('Hey <@' + message.author.id + '> ! Please use the `bank` command in the ' + authorizedChannels[0] + ' channel !');
+                errorMessage = await message.channel.send(i18n.__('Hey <@{{authorId}}> ! Please use the `bank` command in the {{authorizedChannel}} channel !', {authorId: message.author.id, authorizedChannel: authorizedChannels[0]}));
             } 
             if (authorizedChannels.length > 1) {
-                let response = 'Hey <@' + message.author.id + '> ! Please use the `bank` command in one of these channels :\n';
+                let response = i18n.__('Hey <@{{authorId}}> ! Please use the `bank` command in one of these channels :\n', {authorId: message.author.id});
                 authorizedChannels.forEach(channel => {
                     response += '- ' + channel + '\n';
                 });
@@ -40,7 +41,7 @@ module.exports = {
             return;
         }
 
-        const customCurrency = await db.get('config.currency');
+        const customCurrency = await db.get('config.currency') || currency;
         let user = 0;
 
         // User wants his account
@@ -52,23 +53,23 @@ module.exports = {
                 return;
             }
 
-            let userTag = args[0];
-            if (!userTag.startsWith('<@!')) {
-                message.channel.send('Please tag someone !');
+            if (message.mentions.users.length == 0) {
+                message.channel.send(i18n.__('Please tag someone !'));
                 return;
             }
 
-            user = userTag.substring(3, 21);
+            user = message.mentions.users.first().id;
         }
 
         const authClient = await authorize();
         const sheets = google.sheets({version: 'v4', auth: authClient});
         sheets.spreadsheets.values.get({
             spreadsheetId,
-            range: 'Bank!A2:C',
+            range: 'Bank!A2:D',
+            valueRenderOption: 'UNFORMATTED_VALUE'
         }, (err, res) => {
             if (err) {
-                message.channel.send(`Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!`);
+                message.channel.send(i18n.__("Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!"));
                 console.error('An error happened while using Google API: ', err);
                 return;
             }
@@ -80,15 +81,21 @@ module.exports = {
                 });
 
                 if (!row) {
-                    message.channel.send(`No record was found for this user.`);
+                    message.channel.send(i18n.__("No record was found for this user."));
 
                     return;
                 }
 
-                const balance = row[2];
-                message.channel.send(`<@!${user}>'s balance: ${balance}${customCurrency || currency}`);
+                const balance = new Intl.NumberFormat(language).format(parseFloat(row[3]));
+                message.channel.send(
+                    i18n.__("<@!{{user}}>'s balance: {{balance}} {{{customCurrency}}}", {
+                        user,
+                        balance,
+                        customCurrency
+                    })
+                );
             } else {
-                message.channel.send(`Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!`);
+                message.channel.send(i18n.__("Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!"));
                 console.log('No data found in spreadsheet.');
             }
         });

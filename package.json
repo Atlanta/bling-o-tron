@@ -1,13 +1,14 @@
 {
   "name": "bling-o-tron",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Bot helper for WoW boosting communities.",
   "main": "index.js",
   "dependencies": {
     "@keyv/sqlite": "^2.0.2",
     "discord.js": "^12.1.1",
     "googleapis": "^39.2.0",
-    "keyv": "^4.0.0",
+    "i18n": "^0.9.1",
+    "keyv": "^4.0.1",
     "readline-promise": "^1.0.4"
   },
   "devDependencies": {

@@ -4,10 +4,13 @@ const util = require('util');
 const readline = require('readline');
 const Discord = require('discord.js');
 const {google} = require('googleapis');
+const i18n = require("./lib/utils/i18n");
 const { authorize } = require('./security/google');
 const credentials = require('./credentials.json');
-const { currency, prefix, token } = require('./config.json');
+const { currency, prefix, token, language } = require('./config.json');
 const rules = require('./commands/rules');
+
+console.log(i18n.__('language.set'));
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -17,6 +20,8 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
+
+	if (command.aliases) command.aliases.forEach(alias => client.commands.set(alias, command));
 }
 
 client.once('ready', () => {

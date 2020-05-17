@@ -1,0 +1,19 @@
+{
+	"language.set": "Language set to English (United Stated).",
+	"Hey <@{{authorId}}> ! Please use the `bank` command in one of these channels :\n": "Hey <@{{authorId}}> ! Please use the `bank` command in one of these channels :\n",
+	"Hey <@{{authorId}}> ! Please use the `bank` command in the {{authorizedChannel}} channel !": "Hey <@{{authorId}}> ! Please use the `bank` command in the {{authorizedChannel}} channel !",
+	"Sorry <@{{authorId}}>, you cannot use this command right now.": "Sorry <@{{authorId}}>, you cannot use this command right now.",
+	"Get/set allowed channels for !bank command on this server.": "Get/set allowed channels for !bank command on this server.",
+	"Adds an advance in Google Sheets.": "Adds an advance in Google Sheets.",
+	"Shows your personnal bank balance.": "Shows your personnal bank balance.",
+	"Please tag someone !": "Please tag someone !",
+	"<@!{{user}}>'s balance: {{balance}} {{{customCurrency}}}": "<@!{{user}}>'s balance: {{balance}} {{{customCurrency}}}",
+	"Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!": "Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!",
+	"No record was found for this user.": "No record was found for this user.",
+    "Manage transactions in Google Sheets.": "Manage transactions in Google Sheets.",
+    "Please tag one or more users.": "Please tag one or more users.",
+    "Please provide a valid amount !": "Please provide a valid amount !",
+    "Transaction created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}. Booster: {{{booster}}}": "Transaction created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}. Booster: {{{booster}}}",
+    "Transaction created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}. Boosters: {{{boosters}}}": "Transaction created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}. Boosters: {{{boosters}}}",
+    "Advance created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}": "Advance created! ID: `{{id}}`. Amount: {{amount}} {{{currency}}}"
+}
