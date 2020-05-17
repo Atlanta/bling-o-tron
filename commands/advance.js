@@ -1,3 +1,4 @@
+const Intl = require("intl");
 const Keyv = require('keyv');
 const Discord = require('discord.js');
 const { google } = require('googleapis');

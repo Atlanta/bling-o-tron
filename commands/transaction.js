@@ -1,10 +1,11 @@
+const Intl = require("intl");
 const Keyv = require('keyv');
 const Discord = require('discord.js');
 const { google } = require('googleapis');
 const i18n = require("../lib/utils/i18n");
 const Economy = require('../lib/utils/economy');
 const { authorize } = require('../security/google');
-const { currency, spreadsheetId } = require('../config.json');
+const { currency, spreadsheetId, language } = require('../config.json');
 
 module.exports = {
 	name: 'transaction',
@@ -65,7 +66,7 @@ module.exports = {
                     .slice(message.mentions.members.size + 1, arguments.length)
                     .reduce((previous, current) => previous + ' ' + current, '');
 
-                const formattedAmount = new Intl.NumberFormat('fr-FR').format(amount);
+                const formattedAmount = new Intl.NumberFormat(language).format(amount);
 
                 if (members.size == 1) {
                     await this.addTransaction(message, members.first(), amount, description);
@@ -114,7 +115,7 @@ module.exports = {
             }
         });
 
-        const date = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(Date.now());
+        const date = new Intl.DateTimeFormat(language, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(Date.now());
 
         const appendedRow = await sheets.spreadsheets.values.append({
             spreadsheetId,
