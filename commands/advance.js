@@ -18,7 +18,7 @@ module.exports = {
         'add',
     ],
     aliases: [
-        'accompte'
+        'acompte'
     ],
     /**
      * @param {Discord.Message} message 
