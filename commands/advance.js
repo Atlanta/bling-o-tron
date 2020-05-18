@@ -64,7 +64,7 @@ module.exports = {
     async addAdvance(message, amount, description = '') {
         const sheets = google.sheets({version: 'v4', auth: await authorize()});
 
-        const date = new Intl.DateTimeFormat(language, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(Date.now());
+        const date = new Intl.DateTimeFormat(language, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(Date.now());
 
         const appendedRow = await sheets.spreadsheets.values.append({
             spreadsheetId,
