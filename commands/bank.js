@@ -1,3 +1,4 @@
+const Intl = require("intl");
 const Keyv = require('keyv');
 const Discord = require('discord.js');
 const {google} = require('googleapis');
@@ -86,7 +87,7 @@ module.exports = {
                     return;
                 }
 
-                const balance = new Intl.NumberFormat(language).format(parseFloat(row[3]));
+                const balance = new Intl.NumberFormat(language).format(parseInt(row[3]));
                 message.channel.send(
                     i18n.__("<@!{{user}}>'s balance: {{balance}} {{{customCurrency}}}", {
                         user,
