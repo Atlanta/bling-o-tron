@@ -28,6 +28,8 @@ class Transaction {
     constructor(message) {
         const args = message.content.slice(prefix.length).split(/ +/).slice(1);
 
+        console.log('Constructing transactions with args :', args);
+
         if (args.length < 1) {
             throw new NoArgumentException("You must provide some arguments to use this command.");
         }
@@ -136,6 +138,8 @@ module.exports = {
             message.channel.stopTyping(true);
             return;
         }
+
+        console.log("New transaction : ", transaction);
 
         if (transaction.boosters.size == 1) {
             await this.addTransaction(message, transaction.boosters.first(), transaction.client, transaction.server, transaction.amount, transaction.description);
