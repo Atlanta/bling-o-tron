@@ -76,7 +76,7 @@ class Transaction {
      * @param {string} str 
      */
     parseMember(str) {
-       const pattern = /<@!([0-9]+)>/;
+       const pattern = /<@!?([0-9]+)>/;
 
        if (!str.match(pattern)) {
            return null;
