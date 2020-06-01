@@ -18,5 +18,10 @@
 	"Server": "Serveur",
 	"Booster": "Booster",
 	"Client": "Client",
-	"Description": "Description"
+	"Description": "Description",
+	"Hyjal": "Hyjal",
+	"Ysondre": "Ysondre",
+	"Archimonde": "Archimonde",
+	"Total": "Total",
+	"Your bank": "Votre banque"
 }

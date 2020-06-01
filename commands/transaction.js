@@ -6,12 +6,7 @@ const i18n = require("../lib/utils/i18n");
 const Economy = require('../lib/utils/economy');
 const { authorize } = require('../security/google');
 const { currency, spreadsheetId, language, prefix } = require('../config.json');
-
-const ServerLabel = {
-    hyjal: 'Hyjal',
-    ysondre: 'Ysondre',
-    archimonde: 'Archimonde'
-}
+const { ServerList, ServerLabel } = require('../lib/wow/server');
 
 class NoTagException extends Error {}
 class NoBoosterException extends Error {}
@@ -83,24 +78,22 @@ class Transaction {
        }
 
        return pattern.exec(str)[1];
-   }
+    }
 
     /**
      * @param {string} str 
      */
     parseServer(str) {
-       const serverList = ['hyjal', 'ysondre', 'archimonde'];
-
-       if (!serverList.includes(str.toLowerCase())) {
+       if (!ServerList.includes(str.toLowerCase())) {
            return null;
        }
 
        return str.toLowerCase();
-   }
+    }
 
-   getFormattedAmount() {
+    getFormattedAmount() {
        return Intl.NumberFormat(language).format(this.amount);
-   }
+    }
 }
 
 module.exports = {

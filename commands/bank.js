@@ -66,7 +66,7 @@ module.exports = {
         const sheets = google.sheets({version: 'v4', auth: authClient});
         sheets.spreadsheets.values.get({
             spreadsheetId,
-            range: 'Bank!A2:D',
+            range: 'Bank!A2:G',
             valueRenderOption: 'UNFORMATTED_VALUE'
         }, (err, res) => {
             if (err) {
@@ -87,14 +87,24 @@ module.exports = {
                     return;
                 }
 
-                const balance = new Intl.NumberFormat(language).format(parseInt(row[3]));
-                message.channel.send(
-                    i18n.__("<@!{{user}}>'s balance: {{balance}} {{{customCurrency}}}", {
-                        user,
-                        balance,
-                        customCurrency
-                    })
-                );
+                const balance = {
+                    total: new Intl.NumberFormat(language).format(parseInt(row[3])),
+                    hyjal: new Intl.NumberFormat(language).format(parseInt(row[4])),
+                    ysondre: new Intl.NumberFormat(language).format(parseInt(row[5])),
+                    archimonde: new Intl.NumberFormat(language).format(parseInt(row[6])),
+                }
+
+                const embed = new Discord.MessageEmbed()
+                    .setTitle(i18n.__("Your bank"))
+                    // .setAuthor(message.author.username, message.author.avatarURL())
+                    .setTimestamp(message.createdTimestamp)
+                    .setColor('ffb800')
+                    .addField(i18n.__('Hyjal'), `${balance.hyjal} ${customCurrency}`, true)
+                    .addField(i18n.__('Ysondre'), `${balance.ysondre} ${customCurrency}`, true)
+                    .addField(i18n.__('Archimonde'), `${balance.archimonde} ${customCurrency}`, true)
+                    .addField(i18n.__('Total'), `${balance.total} ${customCurrency}`);
+
+                message.channel.send({reply: message.author, embed});
             } else {
                 message.channel.send(i18n.__("Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!"));
                 console.log('No data found in spreadsheet.');
