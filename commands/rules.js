@@ -14,7 +14,7 @@ module.exports = {
      */
 	async execute(message, args) {
         if (!message.mentions.channels.size) {
-            await this.sendRules(message.guild, message.member);
+            await this.sendRules(message.member);
 
             return;
         }
@@ -33,10 +33,10 @@ module.exports = {
         message.channel.send('Rules channel set to <#' + channel + '>.');
     },
     /**
-     * @param {Discord.Guild} guild 
      * @param {Discord.GuildMember} member 
      */
-    async sendRules(guild, member) {
+    async sendRules(member) {
+        const guild = member.guild;
         const db = new Keyv('sqlite://db/' + guild.id + '.sqlite');
 
         const channelID = await db.get('config.rulesChannel');
