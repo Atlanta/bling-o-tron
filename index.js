@@ -69,7 +69,7 @@ client.on('guildMemberAdd', async guildMember => {
 
 client.on('guildMemberUpdate', async (oldMember, member) => {
 	if (oldMember.roles.cache.every(r => r.name != "Booster") && member.roles.cache.some(r => r.name == "Booster")) {
-		member.send(`Hey ${member.displayName} ! You have been promoted to Booster, thus we would like you to check the community rules in the dedicated channel (<#${}), or below because I just copied it for you !`);
+		member.send(`Hey ${member.displayName} ! You have been promoted to Booster, thus we would like you to check the community rules in the dedicated channel, or below because I just copied it for you !`);
 
 		await rules.sendRules(member);
 	}
