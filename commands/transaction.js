@@ -132,16 +132,9 @@ module.exports = {
             return;
         }
 
-        console.log("New transaction : ", transaction);
-
-        if (transaction.boosters.size == 1) {
-            await this.addTransaction(message, transaction.boosters.first(), transaction.client, transaction.server, transaction.amount, transaction.description);
-        } else {
-            await this.batchAddTransaction(message, transaction.boosters, transaction.client, transaction.server, transaction.amount, transaction.description);
-        }
-
-        const acl = new Discord.MessageEmbed()
-            .setTitle(i18n.__('Transaction created !'))
+        const confirmEmbed = new Discord.MessageEmbed()
+            .setTitle(i18n.__('Please confirm transaction data'))
+            .setDescription(i18n.__("Check your transaction informations with data below and react with ✅ to confirm transaction or with ⛔ to cancel."))
             .setAuthor(message.author.username, message.author.avatarURL())
             .setTimestamp(message.createdTimestamp)
             .setColor('ffb800')
@@ -152,8 +145,38 @@ module.exports = {
             .addField(i18n.__('Client'), transaction.client ? transaction.client.toString() : 'Not specified', true)
             .addField(i18n.__('Description'), transaction.description);
 
-        message.channel.send(acl);
+        const confirmMessage = await message.channel.send(confirmEmbed)
         message.channel.stopTyping(true);
+        confirmMessage.react('✅').then(() => confirmMessage.react('⛔'));
+        const filter = (reaction, user) => { return ['✅', '⛔'].includes(reaction.emoji.name) && user.id === message.author.id };
+
+        confirmMessage.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] })
+        .then(async collected => {
+            const reaction = collected.first();
+
+            if (reaction.emoji.name === '✅') {
+                console.log("New transaction : ", transaction);
+
+                if (transaction.boosters.size == 1) {
+                    await this.addTransaction(message, transaction.boosters.first(), transaction.client, transaction.server, transaction.amount, transaction.description);
+                } else {
+                    await this.batchAddTransaction(message, transaction.boosters, transaction.client, transaction.server, transaction.amount, transaction.description);
+                }
+
+                const newEmbed = confirmMessage.embeds[0].setTitle(i18n.__('Transaction created !'))
+                    .setDescription('');
+
+                confirmMessage.edit(newEmbed);
+                confirmMessage.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
+            } else {
+                message.delete().catch(error => console.error('Failed to delete transaction original message: ', error));
+                confirmMessage.delete().catch(error => console.error('Failed to delete transaction confirm message: ', error));
+            }
+        })
+        .catch(() => {
+            message.delete().catch(error => console.error('Failed to delete transaction original message: ', error));
+                confirmMessage.delete().catch(error => console.error('Failed to delete transaction confirm message: ', error));
+        });
     },
     /**
      * @param {Discord.Message} message 
