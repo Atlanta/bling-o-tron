@@ -25,5 +25,8 @@
 	"Total": "Total",
 	"Your bank": "Votre banque",
 	"Please confirm transaction data": "Veuillez confirmer la transaction",
-	"Check your transaction informations with data below and react with ✅ to confirm transaction or with ⛔ to cancel.": "Vérifiez les informations de votre transaction avec les données ci-dessous et réagissez à ce message avec ✅ pour confirmer ou ⛔ pour annuler."
+	"Check your transaction informations with data below and react with ✅ to confirm transaction or with ⛔ to cancel.": "Vérifiez les informations de votre transaction avec les données ci-dessous et réagissez à ce message avec ✅ pour confirmer ou ⛔ pour annuler.",
+	"In-house transaction created !": "In-house transaction created !",
+	"Please tag a client.": "Please tag a client.",
+	"The user's balance on this server is not high enough for this transaction.": "The user's balance on this server is not high enough for this transaction."
 }

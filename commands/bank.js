@@ -43,72 +43,69 @@ module.exports = {
         }
 
         const customCurrency = await db.get('config.currency') || currency;
-        let user = 0;
+        const member = message.mentions.users.length > 0 && message.member.hasPermission('ADMINISTRATOR') ? message.mentions.members.first() : message.guild.member(message.author.id);
 
-        // User wants his account
-        if (args.length === 0) {
-            user = message.author.id;
-        } else { // Now he wants someone else account
-            // But only if he has permissions !
-            if (!message.member.hasPermission('ADMINISTRATOR')) {
-                return;
-            }
+        try {
+            const balance = await this.getBalance(member);
 
-            if (message.mentions.users.length == 0) {
-                message.channel.send(i18n.__('Please tag someone !'));
-                return;
-            }
-
-            user = message.mentions.users.first().id;
-        }
-
-        const authClient = await authorize();
-        const sheets = google.sheets({version: 'v4', auth: authClient});
-        sheets.spreadsheets.values.get({
-            spreadsheetId,
-            range: 'Bank!A2:G',
-            valueRenderOption: 'UNFORMATTED_VALUE'
-        }, (err, res) => {
-            if (err) {
-                message.channel.send(i18n.__("Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!"));
-                console.error('An error happened while using Google API: ', err);
-                return;
-            }
-            /** @type {string[][]} rows */
-            const rows = res.data.values;
-            if (rows.length) {
-                const row = rows.find(row => {
-                    return row[0] == user;
-                });
-
-                if (!row) {
-                    message.channel.send(i18n.__("No record was found for this user."));
-
-                    return;
-                }
-
-                const balance = {
-                    total: new Intl.NumberFormat(language).format(parseInt(row[3])),
-                    hyjal: new Intl.NumberFormat(language).format(parseInt(row[4])),
-                    ysondre: new Intl.NumberFormat(language).format(parseInt(row[5])),
-                    archimonde: new Intl.NumberFormat(language).format(parseInt(row[6])),
+            if (!balance) {
+                message.channel.send(i18n.__("No record was found for this user."));
+            } else {
+                const formattedBalance = {
+                    total: new Intl.NumberFormat(language).format(parseInt(balance.total)),
+                    hyjal: new Intl.NumberFormat(language).format(parseInt(balance.hyjal)),
+                    archimonde: new Intl.NumberFormat(language).format(parseInt(balance.archimonde)),
                 }
 
                 const embed = new Discord.MessageEmbed()
                     .setTitle(i18n.__("Your bank"))
-                    // .setAuthor(message.author.username, message.author.avatarURL())
                     .setTimestamp(message.createdTimestamp)
                     .setColor('ffb800')
-                    .addField(i18n.__('Hyjal'), `${balance.hyjal} ${customCurrency}`, true)
-                    .addField(i18n.__('Ysondre'), `${balance.ysondre} ${customCurrency}`, true)
-                    .addField(i18n.__('Archimonde'), `${balance.archimonde} ${customCurrency}`, true)
-                    .addField(i18n.__('Total'), `${balance.total} ${customCurrency}`);
+                    .addField(i18n.__('Hyjal'), `${formattedBalance.hyjal} ${customCurrency}`, true)
+                    .addField(i18n.__('Archimonde'), `${formattedBalance.archimonde} ${customCurrency}`, true)
+                    .addField(i18n.__('Total'), `${formattedBalance.total} ${customCurrency}`);
 
                 message.channel.send({reply: message.author, embed});
-            } else {
-                message.channel.send(i18n.__("Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!"));
-                console.log('No data found in spreadsheet.');
             }
-        });
+        } catch (err) {
+            message.channel.send(i18n.__("Oops, an error happened. Please retry later. If the problem persist, please contact the support about this!"));
+            console.error('An error happened while using Google API: ', err);
+            return;
+        }
     },
+    /**
+     * 
+     * @param {Discord.GuildMember} member 
+     */
+    async getBalance(member) {
+        const authClient = await authorize();
+        const sheets = google.sheets({version: 'v4', auth: authClient});
+
+        try {
+            const response = (await sheets.spreadsheets.values.get({
+                spreadsheetId,
+                range: 'Bank!A2:G',
+                valueRenderOption: 'UNFORMATTED_VALUE'
+            })).data;
+
+            /** @type {string[][]} rows */
+            const rows = response.values;
+            const row = rows.find(row => {
+                return row[0] == member.id;
+            });
+
+            if (!row) return undefined;
+
+            const balance = {
+                total: parseInt(row[3]),
+                hyjal: parseInt(row[4]),
+                archimonde: parseInt(row[6]),
+            }
+
+            return balance;
+        } catch (err) {
+            console.error(err);
+            throw new Error('Error while fetching Bank informations.');
+        }
+    }
 };

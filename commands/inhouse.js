@@ -8,15 +8,10 @@ const { authorize } = require('../security/google');
 const { currency, spreadsheetId, language, prefix } = require('../config.json');
 const { ServerList, ServerLabel } = require('../lib/wow/server');
 const Transaction = require('../lib/management/transaction');
-
-class NoTagException extends Error {}
-class NoBoosterException extends Error {}
-class BadServerException extends Error {}
-class BadAmountException extends Error {}
-class NoArgumentException extends Error {}
+const { getBalance } = require('./bank');
 
 module.exports = {
-	name: 'transaction',
+	name: 'inhouse',
     description: i18n.__('Manage transactions in Google Sheets.'),
     permission: 'ADMINISTRATOR',
     args: [
@@ -51,6 +46,20 @@ module.exports = {
             return;
         }
 
+        if (!transaction.client) {
+            message.channel.send(i18n.__('Please tag a client.'));
+            message.channel.stopTyping(true);
+            return;
+        }
+
+        const balance = await getBalance(transaction.client);
+
+        if (isNaN(balance[transaction.server]) || balance[transaction.server] < transaction.amount) {
+            message.channel.send(i18n.__('The user\'s balance on this server is not high enough for this transaction.'));
+            message.channel.stopTyping(true);
+            return;
+        }
+
         const confirmEmbed = new Discord.MessageEmbed()
             .setTitle(i18n.__('Please confirm transaction data'))
             .setDescription(i18n.__("Check your transaction informations with data below and react with ✅ to confirm transaction or with ⛔ to cancel."))
@@ -64,7 +73,7 @@ module.exports = {
             .addField(i18n.__('Client'), transaction.client ? transaction.client.toString() : 'Not specified', true)
             .addField(i18n.__('Description'), transaction.description);
 
-        const confirmMessage = await message.channel.send(confirmEmbed)
+        const confirmMessage = await message.channel.send(confirmEmbed);
         message.channel.stopTyping(true);
         confirmMessage.react('✅').then(() => confirmMessage.react('⛔'));
         const filter = (reaction, user) => { return ['✅', '⛔'].includes(reaction.emoji.name) && user.id === message.author.id };
@@ -77,12 +86,14 @@ module.exports = {
                 console.log("New transaction : ", transaction);
 
                 if (transaction.boosters.size == 1) {
-                    await this.addTransaction(message, transaction.boosters.first(), transaction.client, transaction.server, transaction.amount, transaction.description);
+                    await this.addInhouse(message, transaction.boosters.first(), transaction.client, transaction.server, transaction.amount, transaction.description);
                 } else {
-                    await this.batchAddTransaction(message, transaction.boosters, transaction.client, transaction.server, transaction.amount, transaction.description);
+                    await this.batchAddInhouse(message, transaction.boosters, transaction.client, transaction.server, transaction.amount, transaction.description);
                 }
 
-                const newEmbed = confirmMessage.embeds[0].setTitle(i18n.__('Transaction created !'))
+                await this.addInhouse(message, transaction.client, null, transaction.server, -transaction.amount, transaction.description);
+
+                const newEmbed = confirmMessage.embeds[0].setTitle(i18n.__('In-house transaction created !'))
                     .setDescription('');
 
                 confirmMessage.edit(newEmbed);
@@ -105,37 +116,24 @@ module.exports = {
      * @param {number} amount 
      * @param {string} description 
      */
-    async addTransaction(message, member, client, server, amount, description = '') {
-        const db = new Keyv('sqlite://db/' + message.guild.id + '.sqlite');
+    async addInhouse(message, member, client, server, amount, description = '') {
         const sheets = google.sheets({version: 'v4', auth: await authorize()});
-        const cuts = await db.get('config.cuts') || {};
-        const staffCut = await db.get('config.staffCut');
-
-        let customCut = 0.0;
-        let addedCuts = '';
-
-        Object.keys(cuts).forEach(role => {
-            if (message.member.roles.cache.has(role)) {
-                customCut += cuts[role];
-                addedCuts += `Cut ${message.guild.roles.resolve(role).name} : ${cuts[role]}% - `
-            }
-        });
 
         const date = new Intl.DateTimeFormat(language, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(Date.now());
 
-        const appendedRow = await sheets.spreadsheets.values.append({
+        const appendedRow = (await sheets.spreadsheets.values.append({
             spreadsheetId,
             range: 'Transactions!A:O',
             requestBody: {
                 values: [[ message.id ]]
             },
             valueInputOption: 'USER_ENTERED'
-        });
+        })).data;
 
-        const appendedRowId = appendedRow.data.updates.updatedRange.match(/[0-9]+/)[0];
+        const appendedRowId = appendedRow.updates.updatedRange.match(/[0-9]+/)[0];
         const response = await sheets.spreadsheets.values.update({
             spreadsheetId,
-            range: `Transactions!A${appendedRowId}:O`,
+            range: `Transactions!A${appendedRowId}:O${appendedRowId}`,
             requestBody: {
                 values: [[
                     message.id,
@@ -149,10 +147,10 @@ module.exports = {
                     date,
                     description,
                     amount,
-                    `=K${appendedRowId}*${staffCut.toString().replace('.', ',')}/100`,
-                    `=K${appendedRowId}*${customCut.toString().replace('.', ',')}/100`,
+                    '',
+                    '',
                     `=K${appendedRowId}-L${appendedRowId}-M${appendedRowId}`,
-                    addedCuts
+                    'In-house - No cut'
                 ]]
             },
             valueInputOption: 'USER_ENTERED'
@@ -168,9 +166,9 @@ module.exports = {
      * @param {number} amount 
      * @param {string} description 
      */
-    async batchAddTransaction(message, members, client, server, amount, description = '') {
+    async batchAddInhouse(message, members, client, server, amount, description = '') {
         for (const member of members.values()) {
-            await this.addTransaction(message, member, client, server, amount / members.size, description);
+            await this.addInhouse(message, member, client, server, amount / members.size, description);
         }
     },
     /**
